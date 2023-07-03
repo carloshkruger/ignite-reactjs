@@ -7,6 +7,10 @@ import ptBR from 'date-fns/locale/pt-BR'
 export function History() {
   const { cycles } = useContext(CyclesContext)
 
+  const orderedCycles = cycles.sort(
+    (cycleA, cycleB) => cycleB.startDate.getTime() - cycleA.startDate.getTime(),
+  )
+
   return (
     <HistoryContainer>
       <h1>Meu histórico</h1>
@@ -22,7 +26,7 @@ export function History() {
             </tr>
           </thead>
           <tbody>
-            {cycles.map((cycle) => (
+            {orderedCycles.map((cycle) => (
               <tr key={cycle.id}>
                 <td>{cycle.task}</td>
                 <td>{cycle.minutesAmount} minutos</td>
