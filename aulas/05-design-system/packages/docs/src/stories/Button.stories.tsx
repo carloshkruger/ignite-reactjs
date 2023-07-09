@@ -8,7 +8,32 @@ export default {
   component: Button,
   tags: ['autodocs'],
   args: {
-    children: 'Send'
+    children: 'Send',
+    variant: 'primary',
+    size: 'md',
+    disabled: false
+  },
+  argTypes: {
+    size: {
+      options: ['sm', 'md'],
+      control: {
+        type: 'inline-radio'
+      }
+    },
+    variant: {
+      options: ['primary', 'secondary', 'tertiary'],
+      control: {
+        type: 'inline-radio'
+      }
+    },
+    disabled: {
+      control: {
+        type: 'boolean'
+      }
+    },
+    onClick: {
+      action: 'click'
+    }
   }
 } as Meta<ButtonProps>
 
