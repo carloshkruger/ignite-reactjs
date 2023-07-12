@@ -4,7 +4,7 @@ import { setCookie } from 'nookies'
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse
+  res: NextApiResponse,
 ) {
   if (req.method !== 'POST') {
     return res.status(405).end()
@@ -14,8 +14,8 @@ export default async function handler(
 
   const userExists = await prisma.user.findUnique({
     where: {
-      username
-    }
+      username,
+    },
   })
 
   if (userExists) {
@@ -25,13 +25,13 @@ export default async function handler(
   const user = await prisma.user.create({
     data: {
       name,
-      username
+      username,
     },
   })
 
-  setCookie({ res }, '@ignitecall:userId', user.id, {
+  setCookie({ res }, '@igniteCall:userId', user.id, {
     maxAge: 60 * 60 * 24 * 7, // 7 days
-    path: '/'
+    path: '/',
   })
 
   return res.status(201).json(user)
