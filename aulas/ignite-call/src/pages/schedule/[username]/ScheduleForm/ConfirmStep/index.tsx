@@ -4,6 +4,9 @@ import { CalendarBlank, Clock } from 'phosphor-react'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import dayjs from 'dayjs'
+import { api } from '../../../../../lib/axios'
+import { useRouter } from 'next/router'
 
 const confirmFormSchema = z.object({
   name: z.string().min(3, { message: 'O nome precisa no mínimo 3 caracteres' }),
@@ -13,7 +16,15 @@ const confirmFormSchema = z.object({
 
 type ConfirmFormType = z.infer<typeof confirmFormSchema>
 
-export function ConfirmStep() {
+interface ConfirmStepProps {
+  schedulingDate: Date
+  onCancelConfirmation: () => void
+}
+
+export function ConfirmStep({
+  schedulingDate,
+  onCancelConfirmation,
+}: ConfirmStepProps) {
   const {
     register,
     handleSubmit,
@@ -22,18 +33,33 @@ export function ConfirmStep() {
     resolver: zodResolver(confirmFormSchema),
   })
 
-  function handleConfirmScheduling(data: ConfirmFormType) { }
+  const router = useRouter()
+  const username = String(router.query.username)
+
+  async function handleConfirmScheduling(data: ConfirmFormType) {
+    await api.post(`/users/${username}/schedule`, {
+      name: data.name,
+      email: data.email,
+      observations: data.observations,
+      date: schedulingDate,
+    })
+
+    onCancelConfirmation()
+  }
+
+  const describedDate = dayjs(schedulingDate).format('DD[ de ]MMMM[ de ]YYYY')
+  const describedTime = dayjs(schedulingDate).format('HH:mm')
 
   return (
     <ConfirmForm as="form" onSubmit={handleSubmit(handleConfirmScheduling)}>
       <FormHeader>
         <Text>
           <CalendarBlank />
-          22 de setembro de 2022
+          {describedDate}
         </Text>
         <Text>
           <Clock />
-          18:00
+          {describedTime}h
         </Text>
       </FormHeader>
 
@@ -56,14 +82,17 @@ export function ConfirmStep() {
       </label>
 
       <label>
-        <Text size="sm" {...register('observations')}>
-          Observações
-        </Text>
-        <TextArea />
+        <Text size="sm">Observações</Text>
+        <TextArea {...register('observations')} />
       </label>
 
       <FormActions>
-        <Button type="button" variant="tertiary" disabled={isSubmitting}>
+        <Button
+          onClick={() => onCancelConfirmation()}
+          type="button"
+          variant="tertiary"
+          disabled={isSubmitting}
+        >
           Cancelar
         </Button>
         <Button type="submit" disabled={isSubmitting}>
